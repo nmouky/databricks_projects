@@ -1,0 +1,78 @@
+resources:
+  jobs:
+    Collibri_Wind_Turbine_Data:
+      name: Collibri - Wind Turbine Data
+      tasks:
+        - task_key: Bronze_Layer_TEST
+          notebook_task:
+            notebook_path: /Workspace/Users/n.moukayed@gmail.com/databricks_projects/Tests/NB_Collibri_Bronze_Test
+            source: WORKSPACE
+          timeout_seconds: 600
+          health:
+            rules:
+              - metric: RUN_DURATION_SECONDS
+                op: GREATER_THAN
+                value: 300
+          email_notifications:
+            on_failure:
+              - n.moukayed@gmail.com
+            on_duration_warning_threshold_exceeded:
+              - n.moukayed@gmail.com
+        - task_key: Bronze_Layer_NB
+          depends_on:
+            - task_key: Bronze_Layer_TEST
+          notebook_task:
+            notebook_path: /Workspace/Users/n.moukayed@gmail.com/databricks_projects/Notebooks/NB1_Collibri_Bronze
+            source: WORKSPACE
+          timeout_seconds: 600
+          health:
+            rules:
+              - metric: RUN_DURATION_SECONDS
+                op: GREATER_THAN
+                value: 300
+          email_notifications:
+            on_failure:
+              - n.moukayed@gmail.com
+            on_duration_warning_threshold_exceeded:
+              - n.moukayed@gmail.com
+        - task_key: Silver_Layer_NB
+          depends_on:
+            - task_key: Bronze_Layer_NB
+          notebook_task:
+            notebook_path: /Workspace/Users/n.moukayed@gmail.com/databricks_projects/Notebooks/NB2_Collibri_Silver
+            source: WORKSPACE
+          timeout_seconds: 600
+          health:
+            rules:
+              - metric: RUN_DURATION_SECONDS
+                op: GREATER_THAN
+                value: 300
+          email_notifications:
+            on_failure:
+              - n.moukayed@gmail.com
+            on_duration_warning_threshold_exceeded:
+              - n.moukayed@gmail.com
+        - task_key: Gold_Layer_NB
+          depends_on:
+            - task_key: Silver_Layer_NB
+          notebook_task:
+            notebook_path: /Workspace/Users/n.moukayed@gmail.com/databricks_projects/Notebooks/NB3_Collibri_Gold
+            source: WORKSPACE
+          timeout_seconds: 600
+          health:
+            rules:
+              - metric: RUN_DURATION_SECONDS
+                op: GREATER_THAN
+                value: 300
+          email_notifications:
+            on_failure:
+              - n.moukayed@gmail.com
+            on_duration_warning_threshold_exceeded:
+              - n.moukayed@gmail.com
+      git_source:
+        git_url: https://github.com/nmouky/databricks_projects.git
+        git_provider: gitHub
+        git_branch: dev
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
